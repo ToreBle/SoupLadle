@@ -15,12 +15,15 @@ Processing for pooling patients of a large cohorts:
 7. QC and downstream anaylsis with Seurat or Scanpy
 
 ## Installation of SoupLadle
-You can install SoupLadle from Github::
+You can install SoupLadle from Github:
 
 ```{r}
 install.packages("devtools")
 devtools::install_github("https://github.com/ToreBle/SoupLadle")
 ```
+
+## Data
+Raw data: [GSE247708](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE247708)
 
 ## Vignette
 Coming soon...
