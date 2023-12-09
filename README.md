@@ -11,16 +11,11 @@ Processing for pooling patients of a large cohorts:
 3. Evaluation and SNP diversity with SoupLadle
 4. snRNA-seq pooling and sequencing
 5. snRNA-seq deconvolution with existing methods (e.g. [SouporCell](https://github.com/wheaton5/souporcell), [vireo](https://github.com/single-cell-genetics/vireo))
-6. Patient assignement with based matching SNPs
+6. Patient assignment with based matching SNPs
 7. QC and downstream anaylsis with Seurat or Scanpy
 
 ## Installation of SoupLadle
-You can install SoupLadle from Github:
-
-```{r}
-install.packages("devtools")
-devtools::install_github("https://github.com/ToreBle/SoupLadle")
-```
+Coming soon...
 
 ## Data
 Raw data: [GSE247708](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE247708)
@@ -30,4 +25,3 @@ Coming soon...
 
 ## Reference
 The manuscript has been submitted for peer-review
-
