@@ -1,0 +1,19 @@
+[gene-expression]
+reference,/data/uv525372/cellRanger_reference/refdata-gex-GRCh38-2020-A/
+
+[libraries]
+fastq_id,fastqs,feature_types
+KH108,/data/SNP_Multiplexing/data/multiplex/snRNA/KH108,Gene Expression
+KH111,/data/SNP_Multiplexing/data/multiplex/cellplex/KH111,Multiplexing Capture
+
+[samples]
+sample_id,cmo_ids
+Patient_38,CMO308
+Patient_41,CMO309
+Patient_42,CMO310
+Patient_70,CMO311
+Patient_78,CMO312
+
+
+
+

@@ -1,0 +1,20 @@
+[gene-expression]
+reference,/data/uv525372/cellRanger_reference/refdata-gex-GRCh38-2020-A/
+cmo-set,/data/uv525372/multiplexing/Samples/Hash_tag_demultiplexing.csv
+
+[libraries]
+fastq_id,fastqs,feature_types
+KH108,/data/SNP_Multiplexing/data/multiplex/snRNA/KH108,Gene Expression
+KH112,/data/SNP_Multiplexing/data/multiplex/cellplex/KH112,Multiplexing Capture
+
+[samples]
+sample_id,cmo_ids
+Patient_38,HTO_A0451
+Patient_41,HTO_A0452
+Patient_42,HTO_A0453
+Patient_70,HTO_A0454
+Patient_78,HTO_A0455
+
+
+
+
