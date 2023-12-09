@@ -14,8 +14,6 @@ Processing for pooling patients of a large cohorts:
 6. Patient assignment with based matching SNPs
 7. QC and downstream anaylsis with Seurat or Scanpy
 
-## Installation of SoupLadle
-Coming soon...
 
 ## Data
 Raw data: [GSE247708](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE247708)
