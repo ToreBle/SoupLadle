@@ -4,6 +4,8 @@ Next, based on the best matching SNPs from bulk, the deconvoluted nuclei are ass
 
 <img src="https://github.com/ToreBle/SoupLadle/blob/main/SoupLadle_Cover.png" width="500">
 
+
+## Workflow
 Processing for pooling patients of a large cohorts:
 
 1. bulkRNA sequencing for each individual
@@ -14,12 +16,25 @@ Processing for pooling patients of a large cohorts:
 6. Patient assignment with based matching SNPs
 7. QC and downstream anaylsis with Seurat or Scanpy
 
+## Installation
+SoupLadle can be directly installed from Github using the following command:
+
+```r
+if (!require("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
+devtools::install_github("ToreBle/SoupLadle“)
+```
+
+The installation takes only take a few seconds.
+The dependencies of the package are listed in the DESCRIPTION file of the package.
+
 
 ## Data
-Raw data: [GSE247708](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE247708)
+- Raw sequencing data: [GSE247708](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE247708)
 
 ## Vignette
-Coming soon...
+The vignette for the PBMC data of the manuscript can be found [here](https://github.com/ToreBle/SoupLadle).
 
 ## Reference
 The manuscript has been submitted for peer-review
