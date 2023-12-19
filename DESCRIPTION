@@ -1,0 +1,21 @@
+Package: SoupLadle
+Title: SNP-based patient assignment for pooled scRNA-seq data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Tore Bleckwehl", "Developer", role = c("aut", "cre"), email="tbleckwehl@ukaachen.de",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Based on bulk SNP sequencing data, SoupLadle support the evaluation of the SNP profiles to evaluate the pooling of patients in a large cohort of snRNA-seq studies. Based on the bulk profit, SoupLadle assigns the mixed patients of a snRNA-seq run to the individual patients and marks doublets.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    clue,
+    vcfR
+Depends: 
+    R (>= 2.10)
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
