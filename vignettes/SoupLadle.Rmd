@@ -1,0 +1,137 @@
+---
+title: "SoupLadle"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    fig_width: 6 
+    fig_height: 5 
+vignette: >
+  %\VignetteIndexEntry{SoupLadle}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+Single cell RNA sequencing has provided unprecedented insights into the  molecular cues and cellular heterogeneity underlying human disease. However, the high costs and complexity of single cell methods remain a major obstacle for generating large-scale human cohorts.
+Several approaches exist for the pooling and demultiplexing of single-cell and single-nuclei RNA-sequencing, but have different caveats as descirbed in the paper.
+Here, we introduce a workflow for a SNP-based patient assignment with matching bulkRNA-sequencing using existing single-cell demultipexing algorithms (e.g. Souporcell, Vireo).
+In the first step, SoupLadle can be used to evaluate the possible pooling of patients based on the SNP diversity of the bulkRNA-sequnecing from individuals. The approach ensures that for the pooling of large cohorts for snRNA-seq experiements a high SNP diversity is archived that subsequently will help to optimally deconvolute the single nuclei with existing algorithms. Next, based on the best matching SNPs from bulk RNA-seq, the deconvoluted single-nuclei samples are assigned to the patients with SoupLadle. Finally, we can perform QC based on the genetic information (e.g. doublet removal) or add a SNP assay to the single-cell object.
+
+## Installation
+SoupLadle can be directly installed from Github using the following command:
+```{r}
+if (!require("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
+#devtools::install_github("ToreBle/SoupLadle")
+```
+The installation takes only take a few seconds.
+
+## SoupLadle - Patient assignment
+```{r setup}
+library(SoupLadle)
+library(Seurat)
+library(dplyr)
+library(ggplot2)
+```
+
+## Load and filter the data
+Load the variant calling files (VCF) from the scRNA-seq demultiplexing and the varaint calling from the patient-derived bulkRNA-seq. Here, we use the outpout from Souporcell ("cluster_genotypes.vcf") and freebayes called bulkRNA-seq variants for the PBMC data of the paper for demonstration:
+```{r}
+# bulk SNP data
+BULK_VCF <- system.file("extdata", "bulkRNA_genotypes.vcf.gz", package = "SoupLadle")
+gt_BULK <- read_extract_vcf(BULK_VCF)
+
+# demultiplexed cluster
+load(system.file("extdata", "gt_SOUP.rda", package = "SoupLadle"))
+```
+
+Here we only extract the genotype of the VCF and filter for patient-specific single-nucleotide polymorphism (SNPs), resulting in a tibble with SNPs clusters (SOUP) or patients (BULK):
+```{r}
+head(gt_SOUP)
+```
+
+However, only the shared variants are helpful for the patient assignment. Therefore, we concentrate only on variants called in both data set (scRNA-seq and bulkRNA-seq) and subset each tibble by the common variants:
+
+```{r}
+shared_SNP_loci <- intersect(rownames(gt_SOUP), rownames(gt_BULK))
+SOUP <- gt_SOUP[shared_SNP_loci, , drop = FALSE]
+BULK <- gt_BULK[shared_SNP_loci, , drop = FALSE]
+```
+
+## Linear sum assignment
+For the optimal assignment of each demultiplexed single-cell cluster to individual SNPs from bulk, we binarize the genotype information so that we can calcaute the distance between patients based on their SNP profile: 
+```{r}
+SOUP_bin <- Binarize_genotype_values(SOUP)
+BULK_bin <- Binarize_genotype_values(BULK)
+```
+
+Than estimate the distance matrix and solve the linear sum assignment:
+```{r}
+dist_matrix <- SNP_based_assignment(t(SOUP_bin), t(BULK_bin))
+```
+
+Lets have a look at the assignments:
+```{r}
+dist_matrix$Assignments
+```
+
+Having assigned the demultiplexed sc clusters to patients, we can add this to the meta data and output of the demutliplexing. If the output_csv is true, we wil generate a csv file of the meta data that can be used later or outside R.
+```{r}
+cluster_file <- system.file("extdata", "clusters.tsv", package = "SoupLadle")
+demultiplexing_file <- read.table(cluster_file, sep="\t", header=TRUE, row.names=1)
+meta_data <- Assignment_meta_data(assignment_df = dist_matrix$Assignments, clusters = demultiplexing_file, output_csv = TRUE, output_file = "SoupLadle_Assignments.csv")
+```
+
+Here, we will continue with Seurat and first load the pre-processed Seurat object of the PBMC scRNA-seq data set that has been labeled by CMO before demultiplexing so that we can compare both approaches. For the comparision, we rename the clusters and add them to the Seurat object:
+```{r}
+load(file=(system.file("extdata", "PBMC_subsampled.rda", package = "SoupLadle")))
+PBMC
+```
+
+```{r}
+Patient_colors <- c("#195E83", "#DFC8A2", "#E07B39", "#69BDD2", "#80391E", "#606060", "gray")
+
+clusters <- meta_data %>%
+  mutate(SoupLadle  = recode(SoupLadle,
+                             "KH_75" = "Patient_1",
+                             "KH_77" = "Patient_2",
+                             "KH_79" = "Patient_3",
+                             "KH_76" = "Patient_4",
+                             "KH_78" = "Patient_5"),
+  )
+
+PBMC <- AddMetaData(PBMC, metadata = clusters)
+```
+
+Note that the data is not unfiltered, so that we can evaluate the quality and identify doublets (and might filter them out before downstream analysis):
+```{r}
+#Violin QC plots
+VlnPlot(PBMC, features = c("log_prob_singleton"), group.by = "SoupLadle")+scale_fill_manual(values = Patient_colors)
+VlnPlot(PBMC, features = c("nCount_RNA"), group.by = "SoupLadle")+scale_fill_manual(values = Patient_colors)
+```
+
+The total number of molecules (nCount_RNA) is low in the unassigned cells, which might result in a low amount of discriminative SNPs. Doublets are characterized by a high count of molecules as expected. The higher nCount_RNA value for Patient_1 might be explained by the data set, which has been FACS sorted for specific cell types to evaluate the scRNA-seq demultiplexing. We can visualize it as UMAP as well:
+```{r}
+DimPlot(PBMC, group.by = c("SoupLadle"))+scale_color_manual(values = Patient_colors)
+FeaturePlot(PBMC, features = c("doublet_posterior"))
+```
+
+Since the sc samples have been labeled in this case before pooling, we can compare the labeling and SNP-based demultiplexing by first plotting the UMAP:
+```{r}
+DimPlot(PBMC, group.by = c("Cluster"))+scale_color_manual(values = Patient_colors)
+DimPlot(PBMC, group.by = c("CMO_assignment"))+scale_color_manual(values = Patient_colors)
+```
+
+## Session
+```{r}
+sessionInfo()
+```
