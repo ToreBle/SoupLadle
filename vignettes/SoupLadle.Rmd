@@ -26,17 +26,16 @@ Here, we introduce a workflow for a SNP-based patient assignment with matching b
 In the first step, SoupLadle can be used to evaluate the possible pooling of patients based on the SNP diversity of the bulkRNA-sequnecing from individuals. The approach ensures that for the pooling of large cohorts for snRNA-seq experiements a high SNP diversity is archived that subsequently will help to optimally deconvolute the single nuclei with existing algorithms. Next, based on the best matching SNPs from bulk RNA-seq, the deconvoluted single-nuclei samples are assigned to the patients with SoupLadle. Finally, we can perform QC based on the genetic information (e.g. doublet removal) or add a SNP assay to the single-cell object.
 
 ## Installation
-SoupLadle can be directly installed from Github using the following command:
-```{r}
+SoupLadle can be directly installed from [Github](https://github.com/ToreBle/SoupLadle#installation). The installation only takes a minute:
+```{}
 if (!require("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-#devtools::install_github("ToreBle/SoupLadle")
+devtools::install_github("ToreBle/SoupLadle")
 ```
-The installation takes only take a few seconds.
 
 ## SoupLadle - Patient assignment
-```{r setup}
+```{r}
 library(SoupLadle)
 library(KernSmooth)
 library(Seurat)
